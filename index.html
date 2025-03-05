@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -234,14 +233,8 @@
 
         // Inicializa formatação dos campos
         document.addEventListener('DOMContentLoaded', function() {
-            // Não aplicamos formatação decimal para taxa de juros
             formatarDecimal(document.getElementById('valorPrestacao'));
             formatarDecimal(document.getElementById('valorFinanciado'));
-            
-            // Define valores iniciais
-            document.getElementById('taxaJuros').value = '';
-            document.getElementById('valorPrestacao').value = '';
-            document.getElementById('valorFinanciado').value = '';
         });
 
         function calcular() {
@@ -262,14 +255,12 @@
 
             // Converter valores para números (substituindo vírgulas por pontos para valores monetários)
             const parcelasNum = parseInt(numeroParcelas);
-            // Taxa de juros já está como número - apenas converte para decimal
             const taxaJurosNum = parseFloat(taxaJuros) / 100;
             const valorPrestacaoNum = parseFloat(valorPrestacao.replace(',', '.'));
             const valorFinanciadoNum = parseFloat(valorFinanciado.replace(',', '.'));
 
             // Calcular valor total do financiamento
             const valorTotalFinanciamento = valorPrestacaoNum * parcelasNum;
-            // Usar Math.abs para garantir que o valor seja positivo
             const totalJuros = Math.abs(valorTotalFinanciamento - valorFinanciadoNum);
 
             // Formatar para exibição com vírgula
