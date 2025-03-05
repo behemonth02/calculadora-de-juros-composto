@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Financiamento</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        .title {
+            text-align: center;
+            color: black;
+            margin-bottom: 15px;
+            font-size: 24px;
+        }
+        .header {
+            background-color: #007bff;
+            color: white;
+            text-align: center;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .form-group {
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+        }
+        .form-group label {
+            flex: 1;
+            margin-right: 10px;
+        }
+        .form-group-container {
+            flex: 2;
+            display: flex;
+            flex-direction: column;
+        }
+        .form-group .input-container {
+            display: flex;
+            align-items: center;
+            position: relative;
+        }
+        .form-group input {
+            flex-grow: 1;
+            padding: 8px;
+            border: 1px solid #ced4da;
+            text-align: right;
+            padding-right: 25px;
+        }
+        .form-group .prefix {
+            position: absolute;
+            left: 10px;
+            color: #6c757d;
+        }
+        .form-group .percent-symbol {
+            position: absolute;
+            right: 10px;
+            color: #6c757d;
+        }
+        .small-note {
+            font-size: 0.8em;
+            color: #6c757d;
+            margin-top: 5px;
+            text-align: left;
+        }
+        .buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            border: 1px solid #ced4da;
+            border-radius: 5px;
+            cursor: pointer;
+            background-color: white;
+        }
+        #resultado {
+            margin-top: 20px;
+            border: 1px solid #ddd;
+            padding: 15px;
+            text-align: center;
+            display: none; /* Inicialmente oculto */
+        }
+        #exemplo {
+            margin-top: 20px;
+            border: 1px solid #ddd;
+            padding: 15px;
+            background-color: #f8f9fa;
+        }
+        #exemplo h3 {
+            margin-top: 0;
+            color: #007bff;
+        }
+        #exemplo ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        #exemplo ul li {
+            margin-bottom: 5px;
+        }
+        #exemplo p {
+            margin-top: 15px;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="title">
+            Financiamento com prestações fixas
+        </div>
+
+        <div class="header">
+            Simule o financiamento com prestações fixas
+        </div>
+
+        <div class="form-group">
+            <label for="numeroParcelas">Nº. de meses:</label>
+            <div class="form-group-container">
+                <div class="input-container">
+                    <input type="number" id="numeroParcelas" min="1">
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="taxaJuros">Taxa de juros mensal:</label>
+            <div class="form-group-container">
+                <div class="input-container">
+                    <input type="number" id="taxaJuros" min="0" step="any">
+                    <span class="percent-symbol">%</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="valorPrestacao">Valor da prestação:</label>
+            <div class="form-group-container">
+                <div class="input-container">
+                    <span class="prefix">R$</span>
+                    <input type="text" id="valorPrestacao" inputmode="decimal" placeholder="0,00">
+                </div>
+                <div class="small-note">
+                    (Considera-se que a 1ª prestação não seja no ato)
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="valorFinanciado">Valor financiado:</label>
+            <div class="form-group-container">
+                <div class="input-container">
+                    <span class="prefix">R$</span>
+                    <input type="text" id="valorFinanciado" inputmode="decimal" placeholder="0,00">
+                </div>
+                <div class="small-note">
+                    (O valor financiado não inclui o valor da entrada)
+                </div>
+            </div>
+        </div>
+
+        <div class="buttons">
+            <button id="calcular" onclick="calcular()">Calcular</button>
+            <button id="limpar" onclick="limpar()">Limpar</button>
+            <button id="imprimir" onclick="imprimir()">Imprimir</button>
+        </div>
+
+        <!-- Seção de exemplo que será exibida abaixo do botão calcular -->
+        <div id="exemplo">
+            <h3>Exemplo de Cálculo:</h3>
+            <ul>
+                <li><strong>Número de meses:</strong> 12</li>
+                <li><strong>Taxa de juros mensal:</strong> 1%</li>
+                <li><strong>Valor da prestação:</strong> R$ 100,00</li>
+                <li><strong>Valor financiado:</strong> R$ 1.000,00</li>
+            </ul>
+            <p>Neste caso, o valor total do financiamento seria R$ 1.200,00 (12 x R$ 100,00) e o total de juros seria R$ 200,00 (R$ 1.200,00 - R$ 1.000,00).</p>
+        </div>
+
+        <div id="resultado"></div>
+    </div>
+
+    <script>
+        // Função para formatar números com vírgula decimal
+        function formatarDecimal(input) {
+            input.addEventListener('input', function(e) {
+                // Remove tudo exceto números e vírgula
+                let valor = this.value.replace(/[^\d,]/g, '');
+                
+                // Garante apenas uma vírgula
+                let partes = valor.split(',');
+                if (partes.length > 2) {
+                    valor = partes[0] + ',' + partes.slice(1).join('');
+                }
+                
+                // Limita a duas casas decimais após a vírgula
+                if (partes.length > 1 && partes[1].length > 2) {
+                    valor = partes[0] + ',' + partes[1].substring(0, 2);
+                }
+                
+                // Atualiza o valor do campo
+                this.value = valor;
+            });
+            
+            // Formata ao perder o foco
+            input.addEventListener('blur', function() {
+                if (this.value) {
+                    // Divide em parte inteira e decimal
+                    let partes = this.value.split(',');
+                    let inteira = partes[0] || '0';
+                    let decimal = partes.length > 1 ? partes[1] : '00';
+                    
+                    // Garante duas casas decimais
+                    if (decimal.length === 0) decimal = '00';
+                    if (decimal.length === 1) decimal += '0';
+                    
+                    // Atualiza com formato completo
+                    this.value = inteira + ',' + decimal;
+                }
+            });
+        }
+
+        // Inicializa formatação dos campos
+        document.addEventListener('DOMContentLoaded', function() {
+            // Não aplicamos formatação decimal para taxa de juros
+            formatarDecimal(document.getElementById('valorPrestacao'));
+            formatarDecimal(document.getElementById('valorFinanciado'));
+            
+            // Define valores iniciais
+            document.getElementById('taxaJuros').value = '';
+            document.getElementById('valorPrestacao').value = '';
+            document.getElementById('valorFinanciado').value = '';
+        });
+
+        function calcular() {
+            // Ocultar o exemplo quando clicar em calcular
+            document.getElementById('exemplo').style.display = 'none';
+            
+            // Capturar valores
+            const numeroParcelas = document.getElementById('numeroParcelas').value;
+            let taxaJuros = document.getElementById('taxaJuros').value;
+            let valorPrestacao = document.getElementById('valorPrestacao').value;
+            let valorFinanciado = document.getElementById('valorFinanciado').value;
+
+            // Validar todos os campos
+            if (!numeroParcelas || !taxaJuros || !valorPrestacao || !valorFinanciado) {
+                alert('Por favor, preencha todos os campos.');
+                return;
+            }
+
+            // Converter valores para números (substituindo vírgulas por pontos para valores monetários)
+            const parcelasNum = parseInt(numeroParcelas);
+            // Taxa de juros já está como número - apenas converte para decimal
+            const taxaJurosNum = parseFloat(taxaJuros) / 100;
+            const valorPrestacaoNum = parseFloat(valorPrestacao.replace(',', '.'));
+            const valorFinanciadoNum = parseFloat(valorFinanciado.replace(',', '.'));
+
+            // Calcular valor total do financiamento
+            const valorTotalFinanciamento = valorPrestacaoNum * parcelasNum;
+            // Usar Math.abs para garantir que o valor seja positivo
+            const totalJuros = Math.abs(valorTotalFinanciamento - valorFinanciadoNum);
+
+            // Formatar para exibição com vírgula
+            const formatarMoedaExibicao = (valor) => {
+                return valor.toFixed(2).replace('.', ',');
+            };
+
+            // Mostrar resultado
+            const resultadoDiv = document.getElementById('resultado');
+            resultadoDiv.innerHTML = `
+                <h3>Resultado do Financiamento</h3>
+                <p>Número de Parcelas: ${parcelasNum}</p>
+                <p>Taxa de Juros Mensal: ${taxaJuros}%</p>
+                <p>Valor da Prestação: R$ ${formatarMoedaExibicao(valorPrestacaoNum)}</p>
+                <p>Valor Financiado: R$ ${formatarMoedaExibicao(valorFinanciadoNum)}</p>
+                <p>Valor Total do Financiamento: R$ ${formatarMoedaExibicao(valorTotalFinanciamento)}</p>
+                <p>Total de Juros Pagos: R$ ${formatarMoedaExibicao(totalJuros)}</p>
+            `;
+            
+            // Exibir a div de resultado
+            resultadoDiv.style.display = 'block';
+        }
+
+        function limpar() {
+            // Limpar todos os campos
+            document.getElementById('numeroParcelas').value = '';
+            document.getElementById('taxaJuros').value = '';
+            document.getElementById('valorPrestacao').value = '';
+            document.getElementById('valorFinanciado').value = '';
+            
+            // Ocultar a div de resultado
+            document.getElementById('resultado').innerHTML = '';
+            document.getElementById('resultado').style.display = 'none';
+            
+            // Exibir novamente o exemplo
+            document.getElementById('exemplo').style.display = 'block';
+        }
+
+        function imprimir() {
+            // Acionar impressão da página
+            window.print();
+        }
+    </script>
+</body>
+</html>
