@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -261,15 +262,15 @@
 
             // Converter valores para números (substituindo vírgulas por pontos para valores monetários)
             const parcelasNum = parseInt(numeroParcelas);
+            // Taxa de juros já está como número - apenas converte para decimal
             const taxaJurosNum = parseFloat(taxaJuros) / 100;
             const valorPrestacaoNum = parseFloat(valorPrestacao.replace(',', '.'));
             const valorFinanciadoNum = parseFloat(valorFinanciado.replace(',', '.'));
 
             // Calcular valor total do financiamento
             const valorTotalFinanciamento = valorPrestacaoNum * parcelasNum;
-            
-            // Calcular os juros pagos
-            const totalJuros = valorTotalFinanciamento - valorFinanciadoNum;
+            // Usar Math.abs para garantir que o valor seja positivo
+            const totalJuros = Math.abs(valorTotalFinanciamento - valorFinanciadoNum);
 
             // Formatar para exibição com vírgula
             const formatarMoedaExibicao = (valor) => {
