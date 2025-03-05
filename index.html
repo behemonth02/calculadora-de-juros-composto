@@ -209,8 +209,9 @@
             // Calcular o valor total do financiamento
             const valorTotalFinanciamento = valorPrestacaoNum * parcelasNum;
 
-            // Calcular o valor do financiamento sem os juros
-            const valorFinanciadoCalculado = valorPrestacaoNum * parcelasNum / (1 + taxaJurosNum); 
+            // Calcular o valor financiado sem os juros
+            // Fórmula para o valor financiado (sem juros)
+            const valorFinanciadoCalculado = valorPrestacaoNum * parcelasNum / (1 + taxaJurosNum);
 
             // Calcular os juros totais
             const totalJuros = valorTotalFinanciamento - valorFinanciadoCalculado;
