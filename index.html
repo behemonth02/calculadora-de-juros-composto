@@ -129,7 +129,7 @@
             <label for="numeroParcelas">Nº. de meses:</label>
             <div class="form-group-container">
                 <div class="input-container">
-                    <input type="number" id="numeroParcelas" value="10" min="1">
+                    <input type="number" id="numeroParcelas" value="12" min="1">
                 </div>
             </div>
         </div>
@@ -149,7 +149,7 @@
             <div class="form-group-container">
                 <div class="input-container">
                     <span class="prefix">R$</span>
-                    <input type="text" id="valorPrestacao" value="1000.00" inputmode="decimal" placeholder="0,00">
+                    <input type="text" id="valorPrestacao" value="500.00" inputmode="decimal" placeholder="0,00">
                 </div>
             </div>
         </div>
@@ -172,12 +172,12 @@
         <div id="exemplo">
             <h3>Exemplo de Cálculo:</h3>
             <ul>
-                <li><strong>Número de meses:</strong> 10</li>
+                <li><strong>Número de meses:</strong> 12</li>
                 <li><strong>Taxa de juros mensal:</strong> 1%</li>
-                <li><strong>Valor da prestação:</strong> R$ 1.000,00</li>
+                <li><strong>Valor da prestação:</strong> R$ 500,00</li>
                 <li><strong>Valor financiado:</strong> R$ 0,00</li>
             </ul>
-            <p>Neste caso, o valor total do financiamento seria R$ 10.000,00 (10 x R$ 1.000,00) e o total de juros seria R$ 528,69 (R$ 10.000,00 - R$ 9.471,31).</p>
+            <p>Neste caso, o valor total do financiamento seria R$ 6.000,00 (12 x R$ 500,00) e o total de juros seria R$ 59,41 (R$ 6.000,00 - R$ 5.940,59).</p>
         </div>
 
         <div id="resultado"></div>
@@ -209,9 +209,8 @@
             // Calcular o valor total do financiamento
             const valorTotalFinanciamento = valorPrestacaoNum * parcelasNum;
 
-            // Calcular o valor financiado sem os juros
-            // Fórmula para o valor financiado (sem juros)
-            const valorFinanciadoCalculado = valorPrestacaoNum * parcelasNum / (1 + taxaJurosNum);
+            // Calcular o valor financiado (valor presente das parcelas)
+            const valorFinanciadoCalculado = valorPrestacaoNum * (1 - (Math.pow(1 + taxaJurosNum, -parcelasNum)))/taxaJurosNum;
 
             // Calcular os juros totais
             const totalJuros = valorTotalFinanciamento - valorFinanciadoCalculado;
