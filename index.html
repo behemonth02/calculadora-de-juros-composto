@@ -5,7 +5,114 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Calculadora de Financiamento</title>
     <style>
-        /* Estilos mantidos iguais */
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        .title {
+            text-align: center;
+            color: black;
+            margin-bottom: 15px;
+            font-size: 24px;
+        }
+        .header {
+            background-color: #007bff;
+            color: white;
+            text-align: center;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .form-group {
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+        }
+        .form-group label {
+            flex: 1;
+            margin-right: 10px;
+        }
+        .form-group-container {
+            flex: 2;
+            display: flex;
+            flex-direction: column;
+        }
+        .form-group .input-container {
+            display: flex;
+            align-items: center;
+            position: relative;
+        }
+        .form-group input {
+            flex-grow: 1;
+            padding: 8px;
+            border: 1px solid #ced4da;
+            text-align: right;
+            padding-right: 25px;
+        }
+        .form-group .prefix {
+            position: absolute;
+            left: 10px;
+            color: #6c757d;
+        }
+        .form-group .percent-symbol {
+            position: absolute;
+            right: 10px;
+            color: #6c757d;
+        }
+        .small-note {
+            font-size: 0.8em;
+            color: #6c757d;
+            margin-top: 5px;
+            text-align: left;
+        }
+        .buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            border: 1px solid #ced4da;
+            border-radius: 5px;
+            cursor: pointer;
+            background-color: white;
+        }
+        #resultado {
+            margin-top: 20px;
+            border: 1px solid #ddd;
+            padding: 15px;
+            text-align: center;
+            display: none; /* Inicialmente oculto */
+        }
+        #exemplo {
+            margin-top: 20px;
+            border: 1px solid #ddd;
+            padding: 15px;
+            background-color: #f8f9fa;
+        }
+        #exemplo h3 {
+            margin-top: 0;
+            color: #007bff;
+        }
+        #exemplo ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        #exemplo ul li {
+            margin-bottom: 5px;
+        }
+        #exemplo p {
+            margin-top: 15px;
+            font-style: italic;
+        }
     </style>
 </head>
 <body>
@@ -63,12 +170,12 @@
         <div id="exemplo">
             <h3>Exemplo de Cálculo:</h3>
             <ul>
-                <li><strong>Número de meses:</strong> 12</li>
+                <li><strong>Número de meses:</strong> 10</li>
                 <li><strong>Taxa de juros mensal:</strong> 1%</li>
-                <li><strong>Valor da prestação:</strong> R$ 100,00</li>
-                <li><strong>Valor financiado:</strong> R$ 1.116,14</li>
+                <li><strong>Valor da prestação:</strong> R$ 50,00</li>
+                <li><strong>Valor financiado:</strong> R$ 473,50</li>
             </ul>
-            <p>Neste caso, o valor total do financiamento seria R$ 1.200,00 (12 x R$ 100,00) e o total de juros seria R$ 83,86 (R$ 1.200,00 - R$ 1.116,14).</p>
+            <p>Neste caso, o valor total do financiamento seria R$ 500,00 (10 x R$ 50,00) e o total de juros seria R$ 26,50 (R$ 500,00 - R$ 473,50).</p>
         </div>
 
         <div id="resultado"></div>
@@ -113,8 +220,8 @@
             const valorPrestacao = parseFloat(document.getElementById('valorPrestacao').value.replace(',', '.'));
 
             // Validar campos
-            if (isNaN(numeroParcelas) {
-                alert('Por favor, insira um número válido de parcelas.');
+            if (isNaN(numeroParcelas) || numeroParcelas <= 0) {
+                alert('Por favor, insira um número válido de parcelas (maior que 0).');
                 return;
             }
             if (isNaN(taxaJuros) || taxaJuros <= 0) {
@@ -127,7 +234,13 @@
             }
 
             // Calcular valor financiado
-            const valorFinanciado = valorPrestacao * ((1 - Math.pow(1 + taxaJuros, -numeroParcelas)) / taxaJuros;
+            const valorFinanciado = valorPrestacao * ((1 - Math.pow(1 + taxaJuros, -numeroParcelas)) / taxaJuros);
+
+            // Calcular valor total do financiamento
+            const valorTotalFinanciamento = valorPrestacao * numeroParcelas;
+
+            // Calcular total de juros pagos
+            const totalJuros = valorTotalFinanciamento - valorFinanciado;
 
             // Exibir valor financiado
             document.getElementById('valorFinanciado').value = valorFinanciado.toFixed(2).replace('.', ',');
@@ -140,6 +253,8 @@
                 <p>Taxa de Juros Mensal: ${(taxaJuros * 100).toFixed(2)}%</p>
                 <p>Valor da Prestação: R$ ${valorPrestacao.toFixed(2).replace('.', ',')}</p>
                 <p>Valor Financiado: R$ ${valorFinanciado.toFixed(2).replace('.', ',')}</p>
+                <p>Valor Total do Financiamento: R$ ${valorTotalFinanciamento.toFixed(2).replace('.', ',')}</p>
+                <p>Total de Juros Pagos: R$ ${totalJuros.toFixed(2).replace('.', ',')}</p>
             `;
             resultadoDiv.style.display = 'block';
         }
