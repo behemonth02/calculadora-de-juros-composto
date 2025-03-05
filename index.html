@@ -232,8 +232,8 @@
             const valorFinanciado = parseFloat(document.getElementById('valorFinanciado').value.replace(',', '.'));
 
             // Validar campos
-            if (isNaN(numeroParcelas) {
-                alert('Por favor, insira um número válido de parcelas.');
+            if (isNaN(numeroParcelas) || numeroParcelas <= 0) {
+                alert('Por favor, insira um número válido de parcelas (maior que 0).');
                 return;
             }
             if (isNaN(taxaJuros) || taxaJuros <= 0) {
@@ -248,7 +248,7 @@
             }
             // Se o valor da prestação for fornecido, calcular o valor financiado
             else if (!isNaN(valorPrestacao) && valorPrestacao > 0) {
-                const valorFinanciadoCalculado = valorPrestacao * ((1 - Math.pow(1 + taxaJuros, -numeroParcelas)) / taxaJuros);
+                const valorFinanciadoCalculado = valorPrestacao * ((1 - Math.pow(1 + taxaJuros, -numeroParcelas)) / taxaJuros;
                 document.getElementById('valorFinanciado').value = valorFinanciadoCalculado.toFixed(2).replace('.', ',');
             }
             else {
