@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -130,7 +129,7 @@
             <label for="numeroParcelas">Nº. de meses:</label>
             <div class="form-group-container">
                 <div class="input-container">
-                    <input type="number" id="numeroParcelas" min="1">
+                    <input type="number" id="numeroParcelas" value="10" min="1">
                 </div>
             </div>
         </div>
@@ -139,7 +138,7 @@
             <label for="taxaJuros">Taxa de juros mensal:</label>
             <div class="form-group-container">
                 <div class="input-container">
-                    <input type="number" id="taxaJuros" min="0" step="any">
+                    <input type="number" id="taxaJuros" value="1" min="0" step="any">
                     <span class="percent-symbol">%</span>
                 </div>
             </div>
@@ -150,10 +149,7 @@
             <div class="form-group-container">
                 <div class="input-container">
                     <span class="prefix">R$</span>
-                    <input type="text" id="valorPrestacao" inputmode="decimal" placeholder="0,00">
-                </div>
-                <div class="small-note">
-                    (Considera-se que a 1ª prestação não seja no ato)
+                    <input type="text" id="valorPrestacao" value="1000.00" inputmode="decimal" placeholder="0,00">
                 </div>
             </div>
         </div>
@@ -163,10 +159,7 @@
             <div class="form-group-container">
                 <div class="input-container">
                     <span class="prefix">R$</span>
-                    <input type="text" id="valorFinanciado" inputmode="decimal" placeholder="0,00">
-                </div>
-                <div class="small-note">
-                    (O valor financiado não inclui o valor da entrada)
+                    <input type="text" id="valorFinanciado" value="0.00" inputmode="decimal" placeholder="0,00">
                 </div>
             </div>
         </div>
@@ -174,76 +167,23 @@
         <div class="buttons">
             <button id="calcular" onclick="calcular()">Calcular</button>
             <button id="limpar" onclick="limpar()">Limpar</button>
-            <button id="imprimir" onclick="imprimir()">Imprimir</button>
         </div>
 
-        <!-- Seção de exemplo que será exibida abaixo do botão calcular -->
         <div id="exemplo">
             <h3>Exemplo de Cálculo:</h3>
             <ul>
-                <li><strong>Número de meses:</strong> 12</li>
+                <li><strong>Número de meses:</strong> 10</li>
                 <li><strong>Taxa de juros mensal:</strong> 1%</li>
-                <li><strong>Valor da prestação:</strong> R$ 100,00</li>
-                <li><strong>Valor financiado:</strong> R$ 1.000,00</li>
+                <li><strong>Valor da prestação:</strong> R$ 1.000,00</li>
+                <li><strong>Valor financiado:</strong> R$ 0,00</li>
             </ul>
-            <p>Neste caso, o valor total do financiamento seria R$ 1.200,00 (12 x R$ 100,00) e o total de juros seria R$ 200,00 (R$ 1.200,00 - R$ 1.000,00).</p>
+            <p>Neste caso, o valor total do financiamento seria R$ 10.000,00 (10 x R$ 1.000,00) e o total de juros seria R$ 528,69 (R$ 10.000,00 - R$ 9.471,31).</p>
         </div>
 
         <div id="resultado"></div>
     </div>
 
     <script>
-        // Função para formatar números com vírgula decimal
-        function formatarDecimal(input) {
-            input.addEventListener('input', function(e) {
-                // Remove tudo exceto números e vírgula
-                let valor = this.value.replace(/[^\d,]/g, '');
-                
-                // Garante apenas uma vírgula
-                let partes = valor.split(',');
-                if (partes.length > 2) {
-                    valor = partes[0] + ',' + partes.slice(1).join('');
-                }
-                
-                // Limita a duas casas decimais após a vírgula
-                if (partes.length > 1 && partes[1].length > 2) {
-                    valor = partes[0] + ',' + partes[1].substring(0, 2);
-                }
-                
-                // Atualiza o valor do campo
-                this.value = valor;
-            });
-            
-            // Formata ao perder o foco
-            input.addEventListener('blur', function() {
-                if (this.value) {
-                    // Divide em parte inteira e decimal
-                    let partes = this.value.split(',');
-                    let inteira = partes[0] || '0';
-                    let decimal = partes.length > 1 ? partes[1] : '00';
-                    
-                    // Garante duas casas decimais
-                    if (decimal.length === 0) decimal = '00';
-                    if (decimal.length === 1) decimal += '0';
-                    
-                    // Atualiza com formato completo
-                    this.value = inteira + ',' + decimal;
-                }
-            });
-        }
-
-        // Inicializa formatação dos campos
-        document.addEventListener('DOMContentLoaded', function() {
-            // Não aplicamos formatação decimal para taxa de juros
-            formatarDecimal(document.getElementById('valorPrestacao'));
-            formatarDecimal(document.getElementById('valorFinanciado'));
-            
-            // Define valores iniciais
-            document.getElementById('taxaJuros').value = '';
-            document.getElementById('valorPrestacao').value = '';
-            document.getElementById('valorFinanciado').value = '';
-        });
-
         function calcular() {
             // Ocultar o exemplo quando clicar em calcular
             document.getElementById('exemplo').style.display = 'none';
@@ -262,15 +202,15 @@
 
             // Converter valores para números (substituindo vírgulas por pontos para valores monetários)
             const parcelasNum = parseInt(numeroParcelas);
-            // Taxa de juros já está como número - apenas converte para decimal
             const taxaJurosNum = parseFloat(taxaJuros) / 100;
             const valorPrestacaoNum = parseFloat(valorPrestacao.replace(',', '.'));
             const valorFinanciadoNum = parseFloat(valorFinanciado.replace(',', '.'));
 
-            // Calcular valor total do financiamento
+            // Calcular o valor total do financiamento
             const valorTotalFinanciamento = valorPrestacaoNum * parcelasNum;
-            // Usar Math.abs para garantir que o valor seja positivo
-            const totalJuros = Math.abs(valorTotalFinanciamento - valorFinanciadoNum);
+
+            // Calcular os juros totais (valor total do financiamento - valor financiado)
+            const totalJuros = valorTotalFinanciamento - valorFinanciadoNum;
 
             // Formatar para exibição com vírgula
             const formatarMoedaExibicao = (valor) => {
@@ -306,11 +246,6 @@
             
             // Exibir novamente o exemplo
             document.getElementById('exemplo').style.display = 'block';
-        }
-
-        function imprimir() {
-            // Acionar impressão da página
-            window.print();
         }
     </script>
 </body>
