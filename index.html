@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Juros Compostos</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        input {
+            width: 100%;
+            margin-bottom: 10px;
+            padding: 8px;
+            box-sizing: border-box;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        #resultado {
+            margin-top: 20px;
+            text-align: center;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Calculadora de Juros Compostos</h1>
+        <input type="number" id="valorInicial" placeholder="Valor Inicial (R$)">
+        <input type="number" id="taxaJuros" placeholder="Taxa de Juros (% ao ano)">
+        <input type="number" id="tempo" placeholder="Tempo (anos)">
+        <button onclick="calcular()">Calcular</button>
+        <div id="resultado"></div>
+    </div>
+
+    <script>
+        function calcular() {
+            // Capturar valores dos inputs
+            const valorInicial = parseFloat(document.getElementById('valorInicial').value);
+            const taxaJuros = parseFloat(document.getElementById('taxaJuros').value);
+            const tempo = parseFloat(document.getElementById('tempo').value);
+
+            // Validar inputs
+            if (isNaN(valorInicial) || isNaN(taxaJuros) || isNaN(tempo)) {
+                alert('Por favor, preencha todos os campos corretamente');
+                return;
+            }
+
+            // Calcular juros compostos
+            const montante = valorInicial * Math.pow((1 + taxaJuros / 100), tempo);
+            const jurosGerados = montante - valorInicial;
+
+            // Mostrar resultados
+            const resultadoDiv = document.getElementById('resultado');
+            resultadoDiv.innerHTML = `
+                <p>Montante Final: R$ ${montante.toFixed(2)}</p>
+                <p>Juros Gerados: R$ ${jurosGerados.toFixed(2)}</p>
+            `;
+        }
+    </script>
+</body>
+</html>
