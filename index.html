@@ -209,8 +209,11 @@
             // Calcular o valor total do financiamento
             const valorTotalFinanciamento = valorPrestacaoNum * parcelasNum;
 
-            // Calcular os juros totais (valor total do financiamento - valor financiado)
-            const totalJuros = valorTotalFinanciamento - valorFinanciadoNum;
+            // Calcular o valor do financiamento sem os juros
+            const valorFinanciadoCalculado = valorPrestacaoNum * parcelasNum / (1 + taxaJurosNum); 
+
+            // Calcular os juros totais
+            const totalJuros = valorTotalFinanciamento - valorFinanciadoCalculado;
 
             // Formatar para exibição com vírgula
             const formatarMoedaExibicao = (valor) => {
@@ -224,7 +227,7 @@
                 <p>Número de Parcelas: ${parcelasNum}</p>
                 <p>Taxa de Juros Mensal: ${taxaJuros}%</p>
                 <p>Valor da Prestação: R$ ${formatarMoedaExibicao(valorPrestacaoNum)}</p>
-                <p>Valor Financiado: R$ ${formatarMoedaExibicao(valorFinanciadoNum)}</p>
+                <p>Valor Financiado: R$ ${formatarMoedaExibicao(valorFinanciadoCalculado)}</p>
                 <p>Valor Total do Financiamento: R$ ${formatarMoedaExibicao(valorTotalFinanciamento)}</p>
                 <p>Total de Juros Pagos: R$ ${formatarMoedaExibicao(totalJuros)}</p>
             `;
