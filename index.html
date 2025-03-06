@@ -1,55 +1,303 @@
-function calcular() {
-    // Ocultar o exemplo
-    document.getElementById('exemplo').style.display = 'none';
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Financiamento</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        .title {
+            text-align: center;
+            color: black;
+            margin-bottom: 15px;
+            font-size: 24px;
+        }
+        .header {
+            background-color: #007bff;
+            color: white;
+            text-align: center;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .form-group {
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+        }
+        .form-group label {
+            flex: 1;
+            margin-right: 10px;
+            font-weight: bold;
+        }
+        .form-group-container {
+            flex: 2;
+            display: flex;
+            flex-direction: column;
+        }
+        .form-group .input-container {
+            display: flex;
+            align-items: center;
+            position: relative;
+        }
+        .form-group input {
+            flex-grow: 1;
+            padding: 8px;
+            border: 1px solid #ced4da;
+            border-radius: 5px;
+            text-align: right;
+            padding-right: 25px;
+        }
+        .form-group .prefix {
+            position: absolute;
+            left: 10px;
+            color: #6c757d;
+        }
+        .form-group .percent-symbol {
+            position: absolute;
+            right: 10px;
+            color: #6c757d;
+        }
+        .small-note {
+            font-size: 0.8em;
+            color: #6c757d;
+            margin-top: 5px;
+            text-align: left;
+        }
+        .buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            border: 1px solid #ced4da;
+            border-radius: 5px;
+            cursor: pointer;
+            background-color: #007bff;
+            color: white;
+            font-weight: bold;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        #resultado {
+            margin-top: 20px;
+            border: 1px solid #ddd;
+            padding: 15px;
+            text-align: center;
+            display: none; /* Inicialmente oculto */
+            border-radius: 8px;
+            background-color: #f8f9fa;
+        }
+        #exemplo {
+            margin-top: 20px;
+            border: 1px solid #ddd;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+        }
+        #exemplo h3 {
+            margin-top: 0;
+            color: #007bff;
+        }
+        #exemplo ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        #exemplo ul li {
+            margin-bottom: 5px;
+        }
+        #exemplo p {
+            margin-top: 15px;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="title">Financiamento com prestações fixas</div>
+        <div class="header">Simule o financiamento com prestações fixas</div>
 
-    // Capturar valores
-    const numeroParcelas = parseFloat(document.getElementById('numeroParcelas').value);
-    const taxaJuros = parseFloat(document.getElementById('taxaJuros').value) / 100;
-    const valorPrestacao = document.getElementById('valorPrestacao').value ? 
-        parseFloat(document.getElementById('valorPrestacao').value.replace(',', '.')) : null;
-    const valorFinanciado = document.getElementById('valorFinanciado').value ? 
-        parseFloat(document.getElementById('valorFinanciado').value.replace(',', '.')) : null;
+        <div class="form-group">
+            <label for="numeroParcelas">Nº. de meses:</label>
+            <div class="form-group-container">
+                <div class="input-container">
+                    <input type="number" id="numeroParcelas" min="1">
+                </div>
+            </div>
+        </div>
 
-    // Validar campos obrigatórios
-    if (isNaN(numeroParcelas) || numeroParcelas <= 0) {
-        alert('Por favor, insira um número válido de parcelas (maior que 0).');
-        return;
-    }
-    if (isNaN(taxaJuros) || taxaJuros <= 0) {
-        alert('Por favor, insira uma taxa de juros válida (maior que 0).');
-        return;
-    }
-    
-    // Verificar qual o terceiro campo foi preenchido
-    if (valorPrestacao !== null && valorFinanciado !== null) {
-        alert('Por favor, preencha apenas o valor da prestação OU o valor financiado, não ambos.');
-        return;
-    } else if (valorPrestacao === null && valorFinanciado === null) {
-        alert('Por favor, preencha o valor da prestação OU o valor financiado.');
-        return;
-    }
+        <div class="form-group">
+            <label for="taxaJuros">Taxa de juros mensal:</label>
+            <div class="form-group-container">
+                <div class="input-container">
+                    <input type="number" id="taxaJuros" min="0" step="any">
+                    <span class="percent-symbol">%</span>
+                </div>
+            </div>
+        </div>
 
-    // Se o valor financiado for fornecido, calcular a prestação
-    if (valorFinanciado !== null) {
-        const prestacaoCalculada = (valorFinanciado * taxaJuros) / (1 - Math.pow(1 + taxaJuros, -numeroParcelas));
-        document.getElementById('valorPrestacao').value = prestacaoCalculada.toFixed(2).replace('.', ',');
-    } 
-    // Se o valor da prestação for fornecido, calcular o valor financiado
-    else if (valorPrestacao !== null) {
-        const valorFinanciadoCalculado = valorPrestacao * ((1 - Math.pow(1 + taxaJuros, -numeroParcelas)) / taxaJuros);
-        document.getElementById('valorFinanciado').value = valorFinanciadoCalculado.toFixed(2).replace('.', ',');
-    }
+        <div class="form-group">
+            <label for="valorPrestacao">Valor da prestação:</label>
+            <div class="form-group-container">
+                <div class="input-container">
+                    <span class="prefix">R$</span>
+                    <input type="text" id="valorPrestacao" inputmode="decimal" placeholder="0,00">
+                </div>
+                <div class="small-note">(Considera-se que a 1ª prestação não seja no ato)</div>
+            </div>
+        </div>
 
-    // Exibir resultado
-    const resultadoDiv = document.getElementById('resultado');
-    resultadoDiv.innerHTML = `
-        <h3>Resultado do Financiamento</h3>
-        <p>Número de Parcelas: ${numeroParcelas}</p>
-        <p>Taxa de Juros Mensal: ${(taxaJuros * 100).toFixed(2)}%</p>
-        <p>Valor da Prestação: R$ ${document.getElementById('valorPrestacao').value}</p>
-        <p>Valor Financiado: R$ ${document.getElementById('valorFinanciado').value}</p>
-        <p>Valor Total a Pagar: R$ ${(parseFloat(document.getElementById('valorPrestacao').value.replace(',', '.')) * numeroParcelas).toFixed(2).replace('.', ',')}</p>
-        <p>Total de Juros: R$ ${(parseFloat(document.getElementById('valorPrestacao').value.replace(',', '.')) * numeroParcelas - parseFloat(document.getElementById('valorFinanciado').value.replace(',', '.'))).toFixed(2).replace('.', ',')}</p>
-    `;
-    resultadoDiv.style.display = 'block';
-}
+        <div class="form-group">
+            <label for="valorFinanciado">Valor financiado:</label>
+            <div class="form-group-container">
+                <div class="input-container">
+                    <span class="prefix">R$</span>
+                    <input type="text" id="valorFinanciado" inputmode="decimal" placeholder="0,00">
+                </div>
+                <div class="small-note">(O valor financiado não inclui o valor da entrada)</div>
+            </div>
+        </div>
+
+        <div class="buttons">
+            <button id="calcular" onclick="calcular()">Calcular</button>
+            <button id="limpar" onclick="limpar()">Limpar</button>
+            <button id="imprimir" onclick="imprimir()">Imprimir</button>
+        </div>
+
+        <div id="exemplo">
+            <h3>Exemplo de Cálculo:</h3>
+            <ul>
+                <li><strong>Número de meses:</strong> 10</li>
+                <li><strong>Taxa de juros mensal:</strong> 1%</li>
+                <li><strong>Valor da prestação:</strong> R$ 50,00</li>
+                <li><strong>Valor financiado:</strong> R$ 473,50</li>
+            </ul>
+            <p>Neste caso, o valor total do financiamento seria R$ 500,00 (10 x R$ 50,00) e o total de juros seria R$ 26,50 (R$ 500,00 - R$ 473,50).</p>
+        </div>
+
+        <div id="resultado"></div>
+    </div>
+
+    <script>
+        // Função para formatar números com vírgula decimal
+        function formatarDecimal(input) {
+            input.addEventListener('input', function(e) {
+                let valor = this.value.replace(/[^\d,]/g, '');
+                let partes = valor.split(',');
+                if (partes.length > 2) valor = partes[0] + ',' + partes.slice(1).join('');
+                if (partes.length > 1 && partes[1].length > 2) valor = partes[0] + ',' + partes[1].substring(0, 2);
+                this.value = valor;
+            });
+
+            input.addEventListener('blur', function() {
+                if (this.value) {
+                    let partes = this.value.split(',');
+                    let inteira = partes[0] || '0';
+                    let decimal = partes.length > 1 ? partes[1] : '00';
+                    if (decimal.length === 0) decimal = '00';
+                    if (decimal.length === 1) decimal += '0';
+                    this.value = inteira + ',' + decimal;
+                }
+            });
+        }
+
+        // Inicializa formatação dos campos
+        document.addEventListener('DOMContentLoaded', function() {
+            formatarDecimal(document.getElementById('valorPrestacao'));
+            formatarDecimal(document.getElementById('valorFinanciado'));
+        });
+
+        function calcular() {
+            // Ocultar o exemplo
+            document.getElementById('exemplo').style.display = 'none';
+            
+            // Capturar valores
+            const numeroParcelas = parseFloat(document.getElementById('numeroParcelas').value);
+            const taxaJuros = parseFloat(document.getElementById('taxaJuros').value) / 100;
+            const valorPrestacao = document.getElementById('valorPrestacao').value ? 
+                parseFloat(document.getElementById('valorPrestacao').value.replace(',', '.')) : null;
+            const valorFinanciado = document.getElementById('valorFinanciado').value ? 
+                parseFloat(document.getElementById('valorFinanciado').value.replace(',', '.')) : null;
+                
+            // Validar campos obrigatórios
+            if (isNaN(numeroParcelas) || numeroParcelas <= 0) {
+                alert('Por favor, insira um número válido de parcelas (maior que 0).');
+                return;
+            }
+            if (isNaN(taxaJuros) || taxaJuros <= 0) {
+                alert('Por favor, insira uma taxa de juros válida (maior que 0).');
+                return;
+            }
+            
+            // Verificar qual o terceiro campo foi preenchido
+            if (valorPrestacao !== null && valorFinanciado !== null) {
+                alert('Por favor, preencha apenas o valor da prestação OU o valor financiado, não ambos.');
+                return;
+            } else if (valorPrestacao === null && valorFinanciado === null) {
+                alert('Por favor, preencha o valor da prestação OU o valor financiado.');
+                return;
+            }
+            
+            // Se o valor financiado for fornecido, calcular a prestação
+            if (valorFinanciado !== null) {
+                const prestacaoCalculada = (valorFinanciado * taxaJuros) / (1 - Math.pow(1 + taxaJuros, -numeroParcelas));
+                document.getElementById('valorPrestacao').value = prestacaoCalculada.toFixed(2).replace('.', ',');
+            } 
+            // Se o valor da prestação for fornecido, calcular o valor financiado
+            else if (valorPrestacao !== null) {
+                const valorFinanciadoCalculado = valorPrestacao * ((1 - Math.pow(1 + taxaJuros, -numeroParcelas)) / taxaJuros);
+                document.getElementById('valorFinanciado').value = valorFinanciadoCalculado.toFixed(2).replace('.', ',');
+            }
+            
+            // Recapturar os valores após o cálculo
+            const prestacaoFinal = parseFloat(document.getElementById('valorPrestacao').value.replace(',', '.'));
+            const financiadoFinal = parseFloat(document.getElementById('valorFinanciado').value.replace(',', '.'));
+            
+            // Calcular valores adicionais
+            const valorTotal = prestacaoFinal * numeroParcelas;
+            const totalJuros = valorTotal - financiadoFinal;
+            
+            // Exibir resultado
+            const resultadoDiv = document.getElementById('resultado');
+            resultadoDiv.innerHTML = `
+                <h3>Resultado do Financiamento</h3>
+                <p>Número de Parcelas: ${numeroParcelas}</p>
+                <p>Taxa de Juros Mensal: ${(taxaJuros * 100).toFixed(2)}%</p>
+                <p>Valor da Prestação: R$ ${prestacaoFinal.toFixed(2).replace('.', ',')}</p>
+                <p>Valor Financiado: R$ ${financiadoFinal.toFixed(2).replace('.', ',')}</p>
+                <p>Valor Total a Pagar: R$ ${valorTotal.toFixed(2).replace('.', ',')}</p>
+                <p>Total de Juros: R$ ${totalJuros.toFixed(2).replace('.', ',')}</p>
+            `;
+            resultadoDiv.style.display = 'block';
+        }
+
+        function limpar() {
+            document.getElementById('numeroParcelas').value = '';
+            document.getElementById('taxaJuros').value = '';
+            document.getElementById('valorPrestacao').value = '';
+            document.getElementById('valorFinanciado').value = '';
+            document.getElementById('resultado').innerHTML = '';
+            document.getElementById('resultado').style.display = 'none';
+            document.getElementById('exemplo').style.display = 'block';
+        }
+
+        function imprimir() {
+            window.print();
+        }
+    </script>
+</body>
+</html>
