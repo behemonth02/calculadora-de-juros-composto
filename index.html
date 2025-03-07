@@ -244,32 +244,59 @@
             verificarCalculoAutomatico();
         }
 
-        function verificarCalculoAutomatico() {
-            const numeroParcelas = document.getElementById('numeroParcelas').value;
-            const taxaJuros = document.getElementById('taxaJuros').value;
-            const valorPrestacao = document.getElementById('valorPrestacao').value;
-            const valorFinanciado = document.getElementById('valorFinanciado').value;
-            
-            // Contar quantos campos estão preenchidos
-            let camposPreenchidos = 0;
-            if (numeroParcelas && parseFloat(numeroParcelas) > 0) camposPreenchidos++;
-            if (taxaJuros && parseFloat(taxaJuros) > 0) camposPreenchidos++;
-            if (valorPrestacao && valorPrestacao !== '0,00') camposPreenchidos++;
-            if (valorFinanciado && valorFinanciado !== '0,00') camposPreenchidos++;
-            
-            // Se exatamente 3 campos estiverem preenchidos, podemos calcular automaticamente
-            if (camposPreenchidos === 3) {
-                if (!numeroParcelas || parseFloat(numeroParcelas) <= 0) {
-                    calcularNumeroParcelas();
-                } else if (!taxaJuros || parseFloat(taxaJuros) <= 0) {
-                    calcularTaxaJuros();
-                } else if (!valorPrestacao || valorPrestacao === '0,00') {
-                    calcularValorPrestacao();
-                } else if (!valorFinanciado || valorFinanciado === '0,00') {
-                    calcularValorFinanciado();
-                }
-            }
+       function verificarCalculoAutomatico() {
+    const numeroParcelas = document.getElementById('numeroParcelas').value;
+    const taxaJuros = document.getElementById('taxaJuros').value;
+    const valorPrestacao = document.getElementById('valorPrestacao').value;
+    const valorFinanciado = document.getElementById('valorFinanciado').value;
+    
+    // Contar quantos campos estão preenchidos
+    let camposPreenchidos = 0;
+    if (numeroParcelas && parseFloat(numeroParcelas) > 0) camposPreenchidos++;
+    if (taxaJuros && parseFloat(taxaJuros) > 0) camposPreenchidos++;
+    if (valorPrestacao && valorPrestacao !== '0,00') camposPreenchidos++;
+    if (valorFinanciado && valorFinanciado !== '0,00') camposPreenchidos++;
+    
+    // Se exatamente 3 campos estiverem preenchidos, podemos calcular automaticamente
+    if (camposPreenchidos === 3) {
+        // Verificar qual campo está vazio e calcular seu valor
+        if (!numeroParcelas || parseFloat(numeroParcelas) <= 0) {
+            calcularNumeroParcelas();
+        } else if (!taxaJuros || parseFloat(taxaJuros) <= 0) {
+            calcularTaxaJuros();
+        } else if (!valorPrestacao || valorPrestacao === '0,00') {
+            calcularValorPrestacao();
+        } else if (!valorFinanciado || valorFinanciado === '0,00') {
+            calcularValorFinanciado();
         }
+    }
+}
+
+function calcularNumeroParcelas() {
+    const taxaJuros = parseFloat(document.getElementById('taxaJuros').value) / 100;
+    const valorPrestacao = parseFloat(document.getElementById('valorPrestacao').value.replace(',', '.'));
+    const valorFinanciado = parseFloat(document.getElementById('valorFinanciado').value.replace(',', '.'));
+    
+    if (!isNaN(taxaJuros) && !isNaN(valorPrestacao) && !isNaN(valorFinanciado) && 
+        taxaJuros > 0 && valorPrestacao > 0 && valorFinanciado > 0) {
+        
+        // Verificar se a prestação é maior que os juros do primeiro mês
+        if (valorPrestacao <= valorFinanciado * taxaJuros) {
+            alert('O valor da prestação deve ser maior que os juros do primeiro mês (R$ ' + 
+                  (valorFinanciado * taxaJuros).toFixed(2).replace('.', ',') + ')');
+            return;
+        }
+        
+        // Fórmula correta: n = ln(PMT / (PMT - PV * i)) / ln(1 + i)
+        const numeroParcelas = Math.log(valorPrestacao / (valorPrestacao - valorFinanciado * taxaJuros)) / Math.log(1 + taxaJuros);
+        
+        // Arredondar para cima para garantir que o financiamento seja totalmente pago
+        const numeroParcelasArredondado = Math.ceil(numeroParcelas);
+        document.getElementById('numeroParcelas').value = numeroParcelasArredondado;
+        
+        mostrarResultado();
+    }
+}
 
         function calcularNumeroParcelas() {
             const taxaJuros = parseFloat(document.getElementById('taxaJuros').value) / 100;
