@@ -137,6 +137,24 @@
             text-align: center;
             border-radius: 4px;
         }
+        #loading {
+            display: none;
+            text-align: center;
+            margin-top: 10px;
+        }
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border-left-color: #007bff;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body>
@@ -161,7 +179,7 @@
             <label for="taxaJuros">Taxa de juros mensal:</label>
             <div class="form-group-container">
                 <div class="input-container">
-                    <input type="number" id="taxaJuros" min="0" step="any">
+                    <input type="number" id="taxaJuros" min="0" step="0.01">
                     <span class="percent-symbol">%</span>
                 </div>
             </div>
@@ -193,6 +211,11 @@
             <button id="calcular" onclick="calcular()">Calcular</button>
             <button id="limpar" onclick="limpar()">Limpar</button>
             <button id="imprimir" onclick="imprimir()">Imprimir</button>
+        </div>
+
+        <div id="loading">
+            <div class="spinner"></div>
+            <p>Calculando taxa de juros...</p>
         </div>
 
         <div id="exemplo">
@@ -227,7 +250,6 @@
                     if (decimal.length === 0) decimal = '00';
                     if (decimal.length === 1) decimal += '0';
                     this.value = inteira + ',' + decimal;
-                    // Removida a chamada para verificarCalculoAutomatico
                 }
             });
         }
@@ -239,8 +261,6 @@
             // Sempre permitir que tanto valorPrestacao quanto valorFinanciado sejam preenchidos
             valorFinanciado.disabled = false;
             valorPrestacao.disabled = false;
-            
-            // Removida a chamada para verificarCalculoAutomatico
         }
 
         function calcularNumeroParcelas() {
@@ -270,9 +290,70 @@
         }
 
         function calcularTaxaJuros() {
-            // Essa função é mais complexa e requer métodos numéricos para resolver
-            // Vamos usar uma aproximação simples para este exemplo
-            alert('O cálculo da taxa de juros requer métodos mais complexos. Esta funcionalidade não está disponível na calculadora atual.');
+            const numeroParcelas = parseFloat(document.getElementById('numeroParcelas').value);
+            const valorPrestacao = parseFloat(document.getElementById('valorPrestacao').value.replace(',', '.'));
+            const valorFinanciado = parseFloat(document.getElementById('valorFinanciado').value.replace(',', '.'));
+            
+            if (!isNaN(numeroParcelas) && !isNaN(valorPrestacao) && !isNaN(valorFinanciado) && 
+                numeroParcelas > 0 && valorPrestacao > 0 && valorFinanciado > 0) {
+                
+                // Mostrar o spinner durante o cálculo
+                document.getElementById('loading').style.display = 'block';
+                
+                // Usar setTimeout para dar tempo ao spinner de ser exibido antes do cálculo
+                setTimeout(() => {
+                    // Verificar se a PMT é maior que o valor financiado dividido pelo número de parcelas
+                    if (valorPrestacao <= valorFinanciado / numeroParcelas) {
+                        alert('O valor da prestação deve ser maior que o valor financiado dividido pelo número de parcelas (R$ ' + 
+                              (valorFinanciado / numeroParcelas).toFixed(2).replace('.', ',') + ')');
+                        document.getElementById('loading').style.display = 'none';
+                        return;
+                    }
+                    
+                    // Método de Newton-Raphson para encontrar a taxa de juros
+                    let taxaEstimada = 0.10; // Começar com uma estimativa de 10%
+                    const tolerancia = 0.0000001;
+                    let iteracao = 0;
+                    const maxIteracoes = 100;
+                    let diferenca = Number.MAX_VALUE;
+                    
+                    while (Math.abs(diferenca) > tolerancia && iteracao < maxIteracoes) {
+                        // Função VPL = PV - PMT * (1 - (1 + i)^-n) / i
+                        const vpAtual = valorFinanciado - valorPrestacao * (1 - Math.pow(1 + taxaEstimada, -numeroParcelas)) / taxaEstimada;
+                        
+                        // Derivada da função VPL
+                        const derivada = valorPrestacao * (
+                            (1 - Math.pow(1 + taxaEstimada, -numeroParcelas)) / Math.pow(taxaEstimada, 2) - 
+                            (numeroParcelas * Math.pow(1 + taxaEstimada, -numeroParcelas - 1)) / taxaEstimada
+                        );
+                        
+                        // Nova estimativa pela fórmula de Newton
+                        const novaTaxa = taxaEstimada - vpAtual / derivada;
+                        diferenca = novaTaxa - taxaEstimada;
+                        taxaEstimada = novaTaxa;
+                        iteracao++;
+                        
+                        // Evitar taxas negativas ou extremamente altas
+                        if (taxaEstimada <= 0 || taxaEstimada > 1) {
+                            taxaEstimada = Math.abs(Math.random() * 0.2); // Reiniciar com valor aleatório entre 0 e 20%
+                        }
+                    }
+                    
+                    // Esconder o spinner após o cálculo
+                    document.getElementById('loading').style.display = 'none';
+                    
+                    if (iteracao >= maxIteracoes) {
+                        alert('Não foi possível convergir para uma taxa de juros com os valores fornecidos. Tente outros valores.');
+                        return;
+                    }
+                    
+                    // Converter para porcentagem e mostrar com 2 casas decimais
+                    const taxaJurosPercentual = taxaEstimada * 100;
+                    document.getElementById('taxaJuros').value = taxaJurosPercentual.toFixed(2);
+                    
+                    mostrarResultado();
+                }, 100);
+            }
         }
 
         function calcularValorFinanciado() {
@@ -312,7 +393,6 @@
             const taxaJuros = parseFloat(document.getElementById('taxaJuros').value) / 100;
             const prestacaoFinal = parseFloat(document.getElementById('valorPrestacao').value.replace(',', '.'));
             const financiadoFinal = parseFloat(document.getElementById('valorFinanciado').value.replace(',', '.'));
-            
             const valorTotal = prestacaoFinal * numeroParcelas;
             const totalJuros = valorTotal - financiadoFinal;
             
@@ -320,7 +400,7 @@
             resultadoDiv.innerHTML = `
                 <h3>Resultado do Financiamento</h3>
                 <p>Número de Parcelas: ${numeroParcelas}</p>
-                <p>Taxa de Juros Mensal: ${(taxaJuros * 100).toFixed(2)}%</p>
+                <p>Taxa de Juros Mensal: ${(taxaJuros * 100).toFixed(1)}%</p>
                 <p>Valor da Prestação: R$ ${prestacaoFinal.toFixed(2).replace('.', ',')}</p>
                 <p>Valor Financiado: R$ ${financiadoFinal.toFixed(2).replace('.', ',')}</p>
                 <p>Valor Total a Pagar: R$ ${valorTotal.toFixed(2).replace('.', ',')}</p>
@@ -375,15 +455,25 @@
             document.getElementById('resultado').innerHTML = '';
             document.getElementById('resultado').style.display = 'none';
             document.getElementById('exemplo').style.display = 'block';
+            document.getElementById('loading').style.display = 'none';
         }
 
         function imprimir() {
             window.print();
         }
 
+        function preencherExemploDado() {
+            // Preencher o exemplo do exercício dado
+            document.getElementById('numeroParcelas').value = '10';
+            document.getElementById('valorPrestacao').value = '86,00';
+            document.getElementById('valorFinanciado').value = '750,00';
+            document.getElementById('taxaJuros').value = ''; // Será calculado
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
             formatarDecimal(document.getElementById('valorPrestacao'));
             formatarDecimal(document.getElementById('valorFinanciado'));
+            preencherExemploDado();
         });
     </script>
 </body>
