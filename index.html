@@ -462,13 +462,6 @@
             window.print();
         }
 
-        function preencherExemploDado() {
-            // Preencher o exemplo do exercício dado
-            document.getElementById('numeroParcelas').value = '10';
-            document.getElementById('valorPrestacao').value = '86,00';
-            document.getElementById('valorFinanciado').value = '750,00';
-            document.getElementById('taxaJuros').value = ''; // Será calculado
-        }
 
         document.addEventListener('DOMContentLoaded', function() {
             formatarDecimal(document.getElementById('valorPrestacao'));
