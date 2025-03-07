@@ -258,7 +258,7 @@
             const valorPrestacao = document.getElementById('valorPrestacao');
             const valorFinanciado = document.getElementById('valorFinanciado');
             
-            // Sempre permitir que tanto valorPrestacao quanto valorFinanciado sejam preenchidos
+          
             valorFinanciado.disabled = false;
             valorPrestacao.disabled = false;
         }
@@ -271,17 +271,17 @@
             if (!isNaN(taxaJuros) && !isNaN(valorPrestacao) && !isNaN(valorFinanciado) && 
                 taxaJuros > 0 && valorPrestacao > 0 && valorFinanciado > 0) {
                 
-                // Verificar se a prestação é maior que os juros do primeiro mês
+             
                 if (valorPrestacao <= valorFinanciado * taxaJuros) {
                     alert('O valor da prestação deve ser maior que os juros do primeiro mês (R$ ' + 
                           (valorFinanciado * taxaJuros).toFixed(2).replace('.', ',') + ')');
                     return;
                 }
                 
-                // Fórmula correta: n = ln(PMT / (PMT - PV * i)) / ln(1 + i)
+               
                 const numeroParcelas = Math.log(valorPrestacao / (valorPrestacao - valorFinanciado * taxaJuros)) / Math.log(1 + taxaJuros);
                 
-                // Arredondar para cima para garantir que o financiamento seja totalmente pago
+            
                 const numeroParcelasArredondado = Math.ceil(numeroParcelas);
                 document.getElementById('numeroParcelas').value = numeroParcelasArredondado;
                 
@@ -297,12 +297,12 @@
             if (!isNaN(numeroParcelas) && !isNaN(valorPrestacao) && !isNaN(valorFinanciado) && 
                 numeroParcelas > 0 && valorPrestacao > 0 && valorFinanciado > 0) {
                 
-                // Mostrar o spinner durante o cálculo
+              
                 document.getElementById('loading').style.display = 'block';
                 
-                // Usar setTimeout para dar tempo ao spinner de ser exibido antes do cálculo
+          
                 setTimeout(() => {
-                    // Verificar se a PMT é maior que o valor financiado dividido pelo número de parcelas
+           
                     if (valorPrestacao <= valorFinanciado / numeroParcelas) {
                         alert('O valor da prestação deve ser maior que o valor financiado dividido pelo número de parcelas (R$ ' + 
                               (valorFinanciado / numeroParcelas).toFixed(2).replace('.', ',') + ')');
@@ -310,36 +310,35 @@
                         return;
                     }
                     
-                    // Método de Newton-Raphson para encontrar a taxa de juros
-                    let taxaEstimada = 0.10; // Começar com uma estimativa de 10%
+                  
+                    let taxaEstimada = 0.10; 
                     const tolerancia = 0.0000001;
                     let iteracao = 0;
                     const maxIteracoes = 100;
                     let diferenca = Number.MAX_VALUE;
                     
                     while (Math.abs(diferenca) > tolerancia && iteracao < maxIteracoes) {
-                        // Função VPL = PV - PMT * (1 - (1 + i)^-n) / i
+               
                         const vpAtual = valorFinanciado - valorPrestacao * (1 - Math.pow(1 + taxaEstimada, -numeroParcelas)) / taxaEstimada;
                         
-                        // Derivada da função VPL
                         const derivada = valorPrestacao * (
                             (1 - Math.pow(1 + taxaEstimada, -numeroParcelas)) / Math.pow(taxaEstimada, 2) - 
                             (numeroParcelas * Math.pow(1 + taxaEstimada, -numeroParcelas - 1)) / taxaEstimada
                         );
                         
-                        // Nova estimativa pela fórmula de Newton
+                      
                         const novaTaxa = taxaEstimada - vpAtual / derivada;
                         diferenca = novaTaxa - taxaEstimada;
                         taxaEstimada = novaTaxa;
                         iteracao++;
                         
-                        // Evitar taxas negativas ou extremamente altas
+                  
                         if (taxaEstimada <= 0 || taxaEstimada > 1) {
-                            taxaEstimada = Math.abs(Math.random() * 0.2); // Reiniciar com valor aleatório entre 0 e 20%
+                            taxaEstimada = Math.abs(Math.random() * 0.2); 
                         }
                     }
                     
-                    // Esconder o spinner após o cálculo
+          
                     document.getElementById('loading').style.display = 'none';
                     
                     if (iteracao >= maxIteracoes) {
@@ -347,7 +346,7 @@
                         return;
                     }
                     
-                    // Converter para porcentagem e mostrar com 2 casas decimais
+            
                     const taxaJurosPercentual = taxaEstimada * 100;
                     document.getElementById('taxaJuros').value = taxaJurosPercentual.toFixed(2);
                     
@@ -419,7 +418,7 @@
             const valorFinanciado = document.getElementById('valorFinanciado').value ? 
                 parseFloat(document.getElementById('valorFinanciado').value.replace(',', '.')) : null;
             
-            // Contar quantos campos estão preenchidos
+          
             let camposPreenchidos = 0;
             if (numeroParcelas !== null && numeroParcelas > 0) camposPreenchidos++;
             if (taxaJuros !== null && taxaJuros > 0) camposPreenchidos++;
@@ -431,7 +430,7 @@
                 return;
             }
             
-            // Determinar qual campo calcular
+       
             if (numeroParcelas === null || numeroParcelas <= 0) {
                 calcularNumeroParcelas();
             } else if (taxaJuros === null || taxaJuros <= 0) {
