@@ -280,35 +280,37 @@
             }
         }
 
-        function calcularNumeroParcelas() {
-            const taxaJuros = parseFloat(document.getElementById('taxaJuros').value) / 100;
-            const valorPrestacao = parseFloat(document.getElementById('valorPrestacao').value.replace(',', '.'));
-            const valorFinanciado = parseFloat(document.getElementById('valorFinanciado').value.replace(',', '.'));
-            
-            if (!isNaN(taxaJuros) && !isNaN(valorPrestacao) && !isNaN(valorFinanciado) && 
-                taxaJuros > 0 && valorPrestacao > 0 && valorFinanciado > 0) {
-                
-                // Verificar se a parcela é maior que os juros do primeiro mês
-                if (valorPrestacao <= valorFinanciado * taxaJuros) {
-                    alert('O valor da prestação é muito baixo para cobrir os juros. Aumente o valor da prestação ou diminua o valor financiado.');
-                    return;
-                }
-                
-                // Fórmula para calcular o número de parcelas
-                const numeroParcelas = Math.log(valorPrestacao / (valorPrestacao - valorFinanciado * taxaJuros)) / Math.log(1 + taxaJuros);
-                
-                // Arredondar para cima, mas garantir que seja pelo menos 2 parcelas
-                const parcelasArredondadas = Math.max(2, Math.ceil(numeroParcelas));
-                
-                // Atualizar o campo apenas se estiver vazio
-                if (!document.getElementById('numeroParcelas').value) {
-                    document.getElementById('numeroParcelas').value = parcelasArredondadas;
-                }
-                
-                // Mostrar resultado diretamente sem recalcular
-                mostrarResultado();
-            }
+       function calcularNumeroParcelas() {
+    const taxaJuros = parseFloat(document.getElementById('taxaJuros').value) / 100;
+    const valorPrestacao = parseFloat(document.getElementById('valorPrestacao').value.replace(',', '.'));
+    const valorFinanciado = parseFloat(document.getElementById('valorFinanciado').value.replace(',', '.'));
+    
+    if (!isNaN(taxaJuros) && !isNaN(valorPrestacao) && !isNaN(valorFinanciado) && 
+        taxaJuros > 0 && valorPrestacao > 0 && valorFinanciado > 0) {
+        
+        // Verificar se a parcela é maior que os juros do primeiro mês
+        if (valorPrestacao <= valorFinanciado * taxaJuros) {
+            alert('O valor da prestação é muito baixo para cobrir os juros. Aumente o valor da prestação ou diminua o valor financiado.');
+            return;
         }
+        
+        // Fórmula para calcular o número de parcelas
+        const numeroParcelas = Math.log(valorPrestacao / (valorPrestacao - valorFinanciado * taxaJuros)) / Math.log(1 + taxaJuros);
+        
+        // Arredondar para cima
+        const parcelasArredondadas = Math.ceil(numeroParcelas);
+        
+        // Atualizar o campo apenas se o cálculo for válido
+        if (!isNaN(parcelasArredondadas) && parcelasArredondadas > 0) {
+            document.getElementById('numeroParcelas').value = parcelasArredondadas;
+        } else {
+            document.getElementById('numeroParcelas').value = ''; // Manter vazio se o cálculo for inválido
+        }
+        
+        // Mostrar resultado diretamente sem recalcular
+        mostrarResultado();
+    } 
+}
 
         function mostrarResultado() {
             document.getElementById('exemplo').style.display = 'none';
