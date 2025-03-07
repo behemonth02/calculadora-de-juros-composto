@@ -279,10 +279,21 @@
             if (!isNaN(taxaJuros) && !isNaN(valorPrestacao) && !isNaN(valorFinanciado) && 
                 taxaJuros > 0 && valorPrestacao > 0 && valorFinanciado > 0) {
                 
-                // Calcular número de parcelas usando a fórmula: n = -ln(1 - (PV*i/PMT)) / ln(1+i)
-                // Onde: PV = valor financiado, i = taxa de juros, PMT = valor da prestação
-                const numeroParcelas = Math.log(1 - (valorFinanciado * taxaJuros / valorPrestacao)) / Math.log(1/(1 + taxaJuros)) * -1;
-                document.getElementById('numeroParcelas').value = Math.round(numeroParcelas);
+                // Fórmula corrigida para calcular o número de parcelas
+                // log(1 - (PV * i / PMT)) / log(1 / (1 + i))
+                // Verificar se a prestação é maior que os juros do primeiro mês
+                if (valorPrestacao <= valorFinanciado * taxaJuros) {
+                    alert('O valor da prestação deve ser maior que os juros do primeiro mês (R$ ' + 
+                          (valorFinanciado * taxaJuros).toFixed(2).replace('.', ',') + ')');
+                    return;
+                }
+                
+                // Fórmula correta: n = ln(PMT / (PMT - PV * i)) / ln(1 + i)
+                const numeroParcelas = Math.log(valorPrestacao / (valorPrestacao - valorFinanciado * taxaJuros)) / Math.log(1 + taxaJuros);
+                
+                // Arredondar para cima para garantir que o financiamento seja totalmente pago
+                const numeroParcelasArredondado = Math.ceil(numeroParcelas);
+                document.getElementById('numeroParcelas').value = numeroParcelasArredondado;
                 
                 mostrarResultado();
             }
