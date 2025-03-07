@@ -294,11 +294,16 @@
                     return;
                 }
                 
-                // Fórmula corrigida para calcular o número de parcelas
+                // Fórmula para calcular o número de parcelas
                 const numeroParcelas = Math.log(valorPrestacao / (valorPrestacao - valorFinanciado * taxaJuros)) / Math.log(1 + taxaJuros);
-                const parcelasArredondadas = Math.ceil(numeroParcelas); // Arredonda para cima
                 
-                document.getElementById('numeroParcelas').value = parcelasArredondadas;
+                // Arredondar para cima, mas garantir que seja pelo menos 2 parcelas
+                const parcelasArredondadas = Math.max(2, Math.ceil(numeroParcelas));
+                
+                // Atualizar o campo apenas se estiver vazio
+                if (!document.getElementById('numeroParcelas').value) {
+                    document.getElementById('numeroParcelas').value = parcelasArredondadas;
+                }
                 
                 // Mostrar resultado diretamente sem recalcular
                 mostrarResultado();
