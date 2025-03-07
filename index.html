@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Calculadora de Financiamento</title>
     <style>
-          body {
+        body {
             font-family: Arial, sans-serif;
             max-width: 600px;
             margin: 0 auto;
@@ -198,6 +198,15 @@
     </div>
 
     <script>
+        // Função para inicializar os campos ao carregar a página
+        function inicializarCampos() {
+            document.getElementById('numeroParcelas').value = ''; // Campo "Nº. de meses" começa vazio
+            document.getElementById('taxaJuros').value = '';
+            document.getElementById('valorPrestacao').value = '';
+            document.getElementById('valorFinanciado').value = '';
+        }
+
+        // Função para formatar campos decimais (R$)
         function formatarDecimal(input) {
             input.addEventListener('input', function(e) {
                 let valor = this.value.replace(/[^\d,]/g, '');
@@ -220,10 +229,12 @@
             });
         }
 
+        // Função para gerenciar campos
         function gerenciarCampos(campoAtivo) {
             verificarCalculoAutomatico();
         }
 
+        // Função para verificar o cálculo automático
         function verificarCalculoAutomatico() {
             const numeroParcelas = document.getElementById('numeroParcelas').value;
             const taxaJuros = document.getElementById('taxaJuros').value;
@@ -247,9 +258,12 @@
                          valorFinanciado && valorFinanciado !== '0,00') {
                     calcularNumeroParcelas();
                 }
+            } else {
+                document.getElementById('numeroParcelas').value = ''; // Zerar o campo se a taxa de juros não estiver preenchida
             }
         }
 
+        // Função para calcular o valor financiado
         function calcularValorFinanciado() {
             const numeroParcelas = parseFloat(document.getElementById('numeroParcelas').value);
             const taxaJuros = parseFloat(document.getElementById('taxaJuros').value) / 100;
@@ -265,6 +279,7 @@
             }
         }
 
+        // Função para calcular o valor da prestação
         function calcularValorPrestacao() {
             const numeroParcelas = parseFloat(document.getElementById('numeroParcelas').value);
             const taxaJuros = parseFloat(document.getElementById('taxaJuros').value) / 100;
@@ -280,6 +295,7 @@
             }
         }
 
+        // Função para calcular o número de parcelas
         function calcularNumeroParcelas() {
             const taxaJuros = parseFloat(document.getElementById('taxaJuros').value) / 100;
             const valorPrestacao = parseFloat(document.getElementById('valorPrestacao').value.replace(',', '.'));
@@ -291,6 +307,7 @@
                 // Verificar se a parcela é maior que os juros do primeiro mês
                 if (valorPrestacao <= valorFinanciado * taxaJuros) {
                     alert('O valor da prestação é muito baixo para cobrir os juros. Aumente o valor da prestação ou diminua o valor financiado.');
+                    document.getElementById('numeroParcelas').value = ''; // Zerar o campo "Nº. de meses"
                     return;
                 }
                 
@@ -309,9 +326,12 @@
                 
                 // Mostrar resultado diretamente sem recalcular
                 mostrarResultado();
+            } else {
+                document.getElementById('numeroParcelas').value = ''; // Zerar o campo se os dados forem inválidos
             }
         }
 
+        // Função para mostrar o resultado
         function mostrarResultado() {
             document.getElementById('exemplo').style.display = 'none';
             
@@ -336,79 +356,22 @@
             resultadoDiv.style.display = 'block';
         }
 
-        function calcular() {
-            document.getElementById('exemplo').style.display = 'none';
-            
-            const numeroParcelas = document.getElementById('numeroParcelas').value ? 
-                parseFloat(document.getElementById('numeroParcelas').value) : null;
-            const taxaJuros = document.getElementById('taxaJuros').value ? 
-                parseFloat(document.getElementById('taxaJuros').value) / 100 : null;
-            const valorPrestacao = document.getElementById('valorPrestacao').value ? 
-                parseFloat(document.getElementById('valorPrestacao').value.replace(',', '.')) : null;
-            const valorFinanciado = document.getElementById('valorFinanciado').value ? 
-                parseFloat(document.getElementById('valorFinanciado').value.replace(',', '.')) : null;
-                
-            if (isNaN(taxaJuros) || taxaJuros <= 0) {
-                alert('Por favor, insira uma taxa de juros válida (maior que 0).');
-                return;
-            }
-            
-            // Caso 1: Se temos valor da prestação E valor financiado, calculamos o número de parcelas
-            if (valorPrestacao !== null && valorFinanciado !== null && 
-                valorPrestacao > 0 && valorFinanciado > 0 && 
-                (numeroParcelas === null || numeroParcelas <= 0)) {
-                calcularNumeroParcelas();
-                return;
-            }
-            
-            // Caso 2: Se temos o número de parcelas válido
-            if (numeroParcelas !== null && numeroParcelas > 0) {
-                // Se temos apenas um dos valores (prestação ou financiado), calculamos o outro
-                if (valorPrestacao !== null && valorPrestacao > 0 && 
-                    (valorFinanciado === null || valorFinanciado <= 0)) {
-                    calcularValorFinanciado();
-                } else if (valorFinanciado !== null && valorFinanciado > 0 && 
-                          (valorPrestacao === null || valorPrestacao <= 0)) {
-                    calcularValorPrestacao();
-                } else if ((valorPrestacao === null || valorPrestacao <= 0) && 
-                          (valorFinanciado === null || valorFinanciado <= 0)) {
-                    alert('Por favor, preencha o valor da prestação OU o valor financiado.');
-                    return;
-                } else {
-                    // Se ambos estão preenchidos, recalculamos o valor da prestação baseado no valor financiado
-                    calcularValorPrestacao();
-                }
-                return;
-            }
-            
-            // Se chegamos aqui, faltam dados
-            alert('Por favor, preencha os dados necessários para o cálculo:\n\n' +
-                 '1. Taxa de juros (obrigatório)\n' +
-                 '2. E uma das opções abaixo:\n' +
-                 '   - Valor da prestação E valor financiado (para calcular o número de meses)\n' +
-                 '   - Número de meses E valor da prestação (para calcular o valor financiado)\n' +
-                 '   - Número de meses E valor financiado (para calcular o valor da prestação)');
-        }
-
+        // Função para limpar todos os campos
         function limpar() {
-            document.getElementById('numeroParcelas').value = '';
-            document.getElementById('taxaJuros').value = '';
-            document.getElementById('valorPrestacao').value = '';
-            document.getElementById('valorFinanciado').value = '';
-            
-            document.getElementById('valorPrestacao').disabled = false;
-            document.getElementById('valorFinanciado').disabled = false;
-            
+            inicializarCampos(); // Reutiliza a função de inicialização para limpar os campos
             document.getElementById('resultado').innerHTML = '';
             document.getElementById('resultado').style.display = 'none';
             document.getElementById('exemplo').style.display = 'block';
         }
 
+        // Função para imprimir
         function imprimir() {
             window.print();
         }
 
+        // Inicializar campos ao carregar a página
         document.addEventListener('DOMContentLoaded', function() {
+            inicializarCampos(); // Garante que o campo "Nº. de meses" comece vazio
             formatarDecimal(document.getElementById('valorPrestacao'));
             formatarDecimal(document.getElementById('valorFinanciado'));
         });
